@@ -7,33 +7,34 @@ import torchvision
 from torchvision import datasets, models, transforms
 import matplotlib.pyplot as plt
 import time
-import os,sys
+import os
+import sys
 from tempfile import TemporaryDirectory
 from Qnet import Quantumnet
-QUANTUM=bool(int(sys.argv[1]))
-batch_size=int(sys.argv[2])
+QUANTUM = bool(int(sys.argv[1]))
+batch_size = int(sys.argv[2])
 
 
-filtered_classes = ['plane','car']
-## select to run on CPU or GPU
+filtered_classes = ['plane', 'car']
+# select to run on CPU or GPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-## data preparation
+# data preparation
 customtransform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 trainset = torchvision.datasets.CIFAR10(root='./data/CIFAR', train=True,
-                                        download=True,transform=customtransform)
+                                        download=True, transform=customtransform)
 
 testset = torchvision.datasets.CIFAR10(root='./data/CIFAR', train=False,
-                                       download=True,transform=customtransform)
+                                       download=True, transform=customtransform)
 
 classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
-filtered_labels=[classes.index(cl) for cl in filtered_classes]
-sub_indices={'train': [], 'val': []}
+filtered_labels = [classes.index(cl) for cl in filtered_classes]
+sub_indices = {'train': [], 'val': []}
 
-image_datasets_full={'train': trainset, 'val': testset}
+image_datasets_full = {'train': trainset, 'val': testset}
 for phase in ['train', 'val']:
     for idx, label in enumerate(image_datasets_full[phase].targets):
         if label in filtered_labels:
@@ -49,6 +50,8 @@ dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 def labels_to_filtered(labels):
     """Maps CIFAR labels (0,1,2,3,4,5,6,7,8,9) to the index of filtered_labels"""
     return [filtered_labels.index(label) for label in labels]
+
+
 def imshow(inp, title=None):
     """Display image for Tensor."""
     inp = inp.numpy().transpose((1, 2, 0))
@@ -60,6 +63,7 @@ def imshow(inp, title=None):
     if title is not None:
         plt.title(title)
     plt.pause(0.001)  # pause a bit so that plots are updated
+
 
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     since = time.time()
@@ -122,11 +126,14 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                     torch.save(model.state_dict(), best_model_params_path)
             print()
         time_elapsed = time.time() - since
-        print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
+        print(
+            f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
         print(f'Best val Acc: {best_acc:4f}')
         # load best model weights
         model.load_state_dict(torch.load(best_model_params_path))
     return model
+
+
 def visualize_model_outputs(model, num_images=6):
     was_training = model.training
     model.eval()
@@ -151,20 +158,23 @@ def visualize_model_outputs(model, num_images=6):
                     model.train(mode=was_training)
                     return
         model.train(mode=was_training)
+
+
 def train():
     model_ft = models.resnet18(weights='IMAGENET1K_V1')
     num_ftrs = model_ft.fc.in_features
-    ## to freeze the layers
+    # to freeze the layers
     for param in model_ft.parameters():
         param.requires_grad = False
 
     if QUANTUM:
-        model_ft.fc = Quantumnet(len(filtered_classes),device)
+        model_ft.fc = Quantumnet(len(filtered_classes), device)
 
-    else:model_ft.fc = nn.Linear(num_ftrs, len(filtered_classes))
+    else:
+        model_ft.fc = nn.Linear(num_ftrs, len(filtered_classes))
     model_ft = model_ft.to(device)
 
-    #for name, param in model_ft.named_parameters():
+    # for name, param in model_ft.named_parameters():
     #    if param.requires_grad:
     #        print(name, param.data)
     criterion = nn.CrossEntropyLoss()
@@ -173,12 +183,15 @@ def train():
     optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
     # Decay LR by a factor of 0.1 every 7 epochs
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
-    model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,num_epochs=5)
+    exp_lr_scheduler = lr_scheduler.StepLR(
+        optimizer_ft, step_size=7, gamma=0.1)
+    model_ft = train_model(model_ft, criterion, optimizer_ft,
+                           exp_lr_scheduler, num_epochs=5)
     visualize_model_outputs(model_ft)
-
 
     plt.ioff()
     plt.show()
 
-train()
+if __name__ == "__main__":
+    print("Training start...")
+    train()
