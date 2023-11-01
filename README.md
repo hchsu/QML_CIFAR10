@@ -21,7 +21,7 @@ The second argument is batch_size. For example:
 
 runs classical transfer learning with batch_size=16. 
 
-For the two-class classification with batch size=16, classcial-to-classical transfer lerning takes 20 sec. per epoch.
+For the orignal image size, i.e. (3, 32, 32), the two-class classification with batch size=16, classcial-to-classical transfer lerning takes 20 sec. per epoch.
 
 The classical-to-quantum transfer learning takes 3 min. per epoch.
 
