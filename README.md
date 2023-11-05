@@ -1,5 +1,6 @@
-# Transfer learning for image recognition of CIFAR-10
-The pretrained CNN model is applied as a feature exptractor. 
+# Quantum maching learning for image recognition of CIFAR-10
+For transfer learning,
+the pretrained CNN model is applied as a feature exptractor. 
 Only the last block, the classification block, is trained with CIFAR-10. 
 There are two kind of transfer learning:
 1. classical-to-classical (c2c): The last block is a classical nerual network. 
@@ -25,8 +26,13 @@ For the orignal image size, i.e. (3, 32, 32), the two-class classification with 
 
 The classical-to-quantum transfer learning takes 3 min. per epoch.
 
+## One could train a smaller CNN model with quantum layer from scratch. 
+## To run code:
+    python scrat.py --Quantum 1
+ The argument decides whether to add quantum layer or not. 
 ## The code is based on the reference:
     [1] Andrea Mari, Thomas R. Bromley, Josh Izaac, Maria Schuld, and Nathan Killoran. 
         Transfer learning in hybrid classical-quantum neural networks. Quantum 4, 340 (2020).
     [2] Reference code of [1]. https://github.com/XanaduAI/quantum-transfer-learning/tree/master
     [3] Pytorch tutorial. https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html 
+    [4] Pytorch example for MNIST https://github.com/pytorch/examples/blob/main/mnist/main.py

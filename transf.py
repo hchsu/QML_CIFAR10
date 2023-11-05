@@ -185,5 +185,6 @@ def train():
 
     plt.ioff()
     plt.show()
-
-train()
+if __name__ =='__main__':
+    print('training and testing starts...')
+    train()
